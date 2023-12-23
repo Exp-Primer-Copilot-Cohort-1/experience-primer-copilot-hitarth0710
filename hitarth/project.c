@@ -1,11 +1,11 @@
 #include<stdio.h>
 #include<stdlib.h>
 #include<time.h>
-#include<string.h>
 
-//global variable delaration
+
+//global variable declaration
 #define SIZE 1000
-#define NUM_SORTS 11
+#define NUM_SORTS 6
 
 //Function Prototypes
 double bubbleSort(int arr[], int n);
@@ -15,21 +15,15 @@ void mergeSort(int arr[], int l, int r);
 void merge(int arr[], int l, int m, int r);
 void quickSort(int arr[], int low, int high);
 int partition(int arr[], int low, int high);
-double heapSort(int arr[], int n);
-void heapify(int arr[], int n, int i);
-double radixsort(int arr[], int n);
-int getMax(int arr[], int n);
-void countSort(int arr[], int n, int exp);
-double shellSort(int arr[], int n);
-double countingSort(int arr[], int n);
+void generate_sorted_array(int arr[], int n);
 
-int main() 
+int main()
 {
    int arr[SIZE];
 
    double ss[NUM_SORTS];
 
-   //gererates ramdom numbers
+   //generates random numbers
    srand(time(0));
    for(int i = 0; i < SIZE; i++) {
       arr[i] = rand() % SIZE;
@@ -45,33 +39,20 @@ int main()
    ss[3] = insertionSort(arr, SIZE);
    printf("3. Insertion Sort took %f seconds to execute \n", ss[3]);
 
-   ss[4] = heapSort(arr, SIZE);
-   printf("5. Heap Sort took %f seconds to execute \n", ss[4]); 
-
-   ss[5] = radixsort(arr, SIZE);
-   printf("6. Radix Sort took %f seconds to execute \n", ss[5]);
-
-   ss[6] = shellSort(arr, SIZE);
-   printf("7. Shell Sort took %f seconds to execute \n", ss[6]);
- 
-   ss[7] = countingSort(arr, SIZE);
-   printf("8. Counting Sort took %f seconds to execute \n", ss[7]);
-
-
    clock_t start, end;
 
    start = clock();
    mergeSort(arr, 0, SIZE - 1);
    end = clock();
-   ss[8] = ((double) (end - start)) / CLOCKS_PER_SEC;
-   printf("9. Merge Sort took %f seconds to execute \n", ss[8]);
+   ss[4] = ((double) (end - start)) / CLOCKS_PER_SEC;
+   printf("4. Merge Sort took %f seconds to execute \n", ss[4]);
 
    start = clock();
    quickSort(arr, 0, SIZE - 1);
    end = clock();
-   ss[9]= ((double) (end - start)) / CLOCKS_PER_SEC;
-   printf("10. Quick Sort took %f seconds to execute \n", ss[9]);
-   
+   ss[5]= ((double) (end - start)) / CLOCKS_PER_SEC;
+   printf("5. Quick Sort took %f seconds to execute \n", ss[5]);
+
    //sort the times
    for(int i = 1; i < NUM_SORTS; i++) {
       for(int j = i + 1; j < NUM_SORTS; j++) {
@@ -87,7 +68,16 @@ int main()
    for(int i = 1; i < NUM_SORTS; i++) {
       printf("%f\n",ss[i]);
    }
-   
+   //give sorted input in quicksort
+   //give sorted input in quicksort
+   generate_sorted_array(arr, SIZE);
+   start = clock();
+   quickSort(arr, 0, SIZE - 1);
+   end = clock();
+   double quickSortSortedTime = ((double) (end - start)) / CLOCKS_PER_SEC;
+   printf("Quick Sort Time with sorted data: %f seconds\n", quickSortSortedTime);
+  
+
    return 0;
 }
 
@@ -96,11 +86,11 @@ double bubbleSort(int arr[], int n) {
 
    clock_t start, end;
    double cpu_time_used;
-    
+
    start = clock();
 
-   for(int i = 0; i < n-1; i++) {     
-       for (int j = 0; j < n-i-1; j++) { 
+   for(int i = 0; i < n-1; i++) {
+       for (int j = 0; j < n-i-1; j++) {
            if (arr[j] > arr[j+1]) {
               int temp = arr[j];
               arr[j] = arr[j+1];
@@ -231,135 +221,8 @@ void quickSort(int arr[], int low, int high) {
    }
 }
 
-// Heap Sort
-void heapify(int arr[], int n, int i) {
-   int largest = i;
-   int left = 2 * i + 1;
-   int right = 2 * i + 2;
-   if (left < n && arr[left] > arr[largest])
-      largest = left;
-   if (right < n && arr[right] > arr[largest])
-      largest = right;
-   if (largest != i) {
-      int swap = arr[i];
-      arr[i] = arr[largest];
-      arr[largest] = swap;
-      heapify(arr, n, largest);
-   }
-}
-
-double heapSort(int arr[], int n) {
-
-      clock_t start, end;
-   double cpu_time_used;
-
-   start = clock();
-
-   for (int i = n / 2 - 1; i >= 0; i--)
-      heapify(arr, n, i);
-   for (int i = n - 1; i >= 0; i--) {
-      int temp = arr[0];
-      arr[0] = arr[i];
-      arr[i] = temp;
-      heapify(arr, i, 0);
-   }
-
-   end = clock();
-   cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
-   return cpu_time_used;
-}
-
-// Radix Sort
-int getMax(int arr[], int n) {
-   int mx = arr[0];
-   for (int i = 1; i < n; i++)
-      if (arr[i] > mx)
-         mx = arr[i];
-   return mx;
-}
-
-void countSort(int arr[], int n, int exp) {
-   int output[n];
-   int i, count[10] = {0};
-   for (i = 0; i < n; i++)
-      count[(arr[i] / exp) % 10]++;
-   for (i = 1; i < 10; i++)
-      count[i] += count[i - 1];
-   for (i = n - 1; i >= 0; i--) {
-      output[count[(arr[i] / exp) % 10] - 1] = arr[i];
-      count[(arr[i] / exp) % 10]--;
-   }
-   for (i = 0; i < n; i++)
-      arr[i] = output[i];
-}
-
-double radixsort(int arr[], int n) {
-
-       clock_t start, end;
-   double cpu_time_used;
-
-   start = clock();
-
-   int m = getMax(arr, n);
-   for (int exp = 1; m / exp > 0; exp *= 10)
-      countSort(arr, n, exp);
-
-      end = clock();
-   cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
-   return cpu_time_used;
-}
-
-// Shell Sort
-double shellSort(int arr[], int n) {
-
-   clock_t start, end;
-   double cpu_time_used;
-
-   start = clock();
-
-   for (int gap = n / 2; gap > 0; gap /= 2) {
-      for (int i = gap; i < n; i += 1) {
-         int temp = arr[i];
-         int j;
-         for (j = i; j >= gap && arr[j - gap] > temp; j -= gap)
-            arr[j] = arr[j - gap];
-         arr[j] = temp;
-      }
-   }
-
-     end = clock();
-   cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
-   return cpu_time_used;
-}
-
-// Counting Sort
-double countingSort(int arr[], int n) 
-{
-   clock_t start, end;
-   double cpu_time_used;
-
-   start = clock();
-
-   int max = arr[0];
-   for (int i = 1; i < n; i++)
-      if (arr[i] > max)
-         max = arr[i];
-   int count[max + 1];
-   for (int i = 0; i <= max; ++i)
-      count[i] = 0;
-   for (int i = 0; i < n; i++)
-      count[arr[i]]++;
-   for (int i = 1; i <= max; i++)
-      count[i] += count[i - 1];
-   int output[n];
-   for (int i = n - 1; i >= 0; i--) {
-      output[count[arr[i]] - 1] = arr[i];
-      count[arr[i]]--;
-   }
-   for (int i = 0; i < n; i++)
-      arr[i] = output[i];
-
-        end = clock();
-   cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
-   return cpu_time_used;
+void generate_sorted_array(int arr[], int n) {
+  for (int i = 0; i < n; i++) {
+    arr[i] = i;
+  }
 }

@@ -5,7 +5,6 @@
 struct AttendanceRecord {
     char date[11]; // Assuming date format "DD-MM-YYYY"
     long long enrollment;
-    
     char status; // 'P' for Present, 'A' for Absent
     struct AttendanceRecord* next;
 };
@@ -127,14 +126,46 @@ void inorderTraversal(struct Node* root) {
     }
 }
 
+void loadDataFromFile(const char* filename) {
+    FILE* file = fopen(filename, "r");
+    if (file == NULL) {
+        printf("Unable to open file: %s\n", filename);
+        return;
+    }
+
+    char line[256];
+    while (fgets(line, sizeof(line), file)) {
+        long long enrollment;
+        char name[50];
+        char date[11];
+        char status;
+
+        sscanf(line, "%lld %s %s %c", &enrollment, name, date, &status);
+
+        struct Node* node = createNode(enrollment, name);
+        struct AttendanceRecord* record = (struct AttendanceRecord*)malloc(sizeof(struct AttendanceRecord));
+        strcpy(record->date, date);
+        record->enrollment = enrollment;
+        record->status = status;
+        record->next = NULL;
+
+        node->attendance = record;
+        // Add node to the tree or list
+    }
+
+    fclose(file);
+}
+
 int main() {
     struct Node* root = NULL;
     long choice;
     long long value;
     char name[50], status;
     char date[11]; // Assuming date format "DD-MM-YYYY"
+    char c;
 
-    do {
+
+        do {
         printf("\nAttendance Management System\n");
         printf("1. Insert Attendance\n");
         printf("2. Delete Enrollment\n");
@@ -148,7 +179,12 @@ int main() {
 
         switch (choice) {
             case 1:
-                printf("Enter Enrollment number to insert: ");
+                printf("Do you want to load data from file? (Y/N): ");
+                scanf(" %c%*c", &c); // %*c consumes the newline character
+            if(c == 'Y' || c == 'y') {
+                loadDataFromFile("data.txt");
+            } else {
+               printf("Enter Enrollment number to insert: ");
                 scanf("%lld", &value);
                 printf("Enter Name: ");
                 scanf("%s", name);
@@ -157,6 +193,7 @@ int main() {
                 printf("Enter Date (DD-MM-YYYY): ");
                 scanf("%s", date);
                 root = insert(root, value, name, status, date);
+            }
                 break;
             case 2:
                 printf("Enter Enrollment number to delete: ");
@@ -195,6 +232,7 @@ int main() {
         }
 
     } while (choice != 6);
+    
 
     // Free memory if needed
 

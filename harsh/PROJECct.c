@@ -144,6 +144,11 @@ void generate_random_array(int arr[], int n) {
     arr[i] = rand() % 1000;
   }
 }
+void generate_sorted_array(int arr[], int n) {
+  for (int i = 0; i < n; i++) {
+    arr[i] = i;
+  }
+}
 
 // Print array
 void print_array(int arr[], int n) {
@@ -171,6 +176,11 @@ int main() {
   generate_random_array(arr, ARRAY_SIZE); // Re-randomize for next sort
   printf("Quick Sort Time: %f seconds\n", quickSort(arr,0 , ARRAY_SIZE));
 
+
+// Generate sorted data
+  generate_sorted_array(arr, ARRAY_SIZE);
+  // Measure and print execution time for quick sort with sorted data
+  printf("Quick Sort Time with sorted data: %f seconds\n", quickSort(arr,0 , ARRAY_SIZE));
 
   return 0;
 }
