@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>My First HTML Page</title>
+    <style>
+        body {
+            background-color: rgb(17, 180, 235);
+        }
+        h1 {
+            color: white;
+            text-align: center;
+        }
+        p {
+            font-family: verdana;
+            font-size: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Welcome to My First HTML Page</h1>
+    <p id="demo">This is a sample paragraph.</p>
+    <button onclick="changeText()">Click me</button>
+
+    <script>
+        function changeText() {
+            document.getElementById("demo").innerHTML = "Paragraph changed!";
+        }
+    </script>
+</body>
+</html>
