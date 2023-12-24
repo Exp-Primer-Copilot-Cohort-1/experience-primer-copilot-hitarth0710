@@ -126,7 +126,7 @@ void inorderTraversal(struct Node* root) {
     }
 }
 
-void loadDataFromFile(const char* filename) {
+void loadDataFromFile(const char* filename, struct Node** root) {
     FILE* file = fopen(filename, "r");
     if (file == NULL) {
         printf("Unable to open file: %s\n", filename);
@@ -142,19 +142,56 @@ void loadDataFromFile(const char* filename) {
 
         sscanf(line, "%lld %s %s %c", &enrollment, name, date, &status);
 
-        struct Node* node = createNode(enrollment, name);
-        struct AttendanceRecord* record = (struct AttendanceRecord*)malloc(sizeof(struct AttendanceRecord));
-        strcpy(record->date, date);
-        record->enrollment = enrollment;
-        record->status = status;
-        record->next = NULL;
-
-        node->attendance = record;
-        // Add node to the tree or list
+        *root = insert(*root, enrollment, name, status, date);
     }
 
     fclose(file);
 }
+
+void writeNode(FILE* stream, struct Node* node1) {
+    if (node1 == NULL) {
+        return;
+    }
+
+    // Write the node's data and its linked list
+    fprintf(stream, "    \"%lld\" [label=\"Enrollment: %lld\\nName: %s\\n", node1->data, node1->data, node1->name);
+    struct AttendanceRecord* record = node1->attendance;
+    while (record != NULL) {
+        fprintf(stream, "Date: %s, Status: %c\\n", record->date, record->status);
+        record = record->next;
+    }
+    fprintf(stream, "\"];\n");
+
+    // Write the edges to the child nodes
+    if (node1->left != NULL) {
+        fprintf(stream, "    \"%lld\" -> \"%lld\";\n", node1->data, node1->left->data);
+        writeNode(stream, node1->left);
+    }
+
+    if (node1->right != NULL) {
+        fprintf(stream, "    \"%lld\" -> \"%lld\";\n", node1->data, node1->right->data);
+        writeNode(stream, node1->right);
+    }
+}
+
+void writeDot(struct Node* tree, const char* filename) {
+    FILE* stream = fopen(filename, "w");
+
+    fprintf(stream, "digraph Tree {\n");
+    fprintf(stream, "    node [fontname=\"Arial\"];\n");
+
+    if (!tree) {
+        fprintf(stream, "\n");
+    } else if (!tree->right && !tree->left) {
+        fprintf(stream, "    \"%lld\";\n", tree->data);
+    } else {
+        writeNode(stream, tree);
+    }
+
+    fprintf(stream, "}\n");
+    fclose(stream);
+}
+
 
 int main() {
     struct Node* root = NULL;
@@ -172,7 +209,8 @@ int main() {
         printf("3. Search Enrollment\n");
         printf("4. Display Enrollments\n");
         printf("5. Display Attendance for a Date\n");
-        printf("6. Exit\n");
+        printf("6. Generate .dot file\n");
+        printf("7. Exit\n");
 
         printf("Enter your choice: ");
         scanf("%ld", &choice);
@@ -182,7 +220,7 @@ int main() {
                 printf("Do you want to load data from file? (Y/N): ");
                 scanf(" %c%*c", &c); // %*c consumes the newline character
             if(c == 'Y' || c == 'y') {
-                loadDataFromFile("data.txt");
+                loadDataFromFile("data.txt", &root);
             } else {
                printf("Enter Enrollment number to insert: ");
                 scanf("%lld", &value);
@@ -225,6 +263,10 @@ int main() {
                 displayAttendanceForDay(root, date);
                 break;
             case 6:
+                writeDot(root, "bst.dot");
+                printf("Generated bst.dot file.\n");
+                break;
+            case 7:
                 printf("Exiting the program.\n");
                 break;
             default:

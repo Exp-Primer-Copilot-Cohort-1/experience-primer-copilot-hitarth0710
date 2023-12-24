@@ -2,6 +2,10 @@
     "files.associations": {
         "iostream": "cpp",
         "stdio.h": "c",
-        "10.1.C": "cpp"
+        "10.1.C": "cpp",
+        "array": "cpp",
+        "deque": "cpp",
+        "vector": "cpp",
+        "string_view": "cpp"
     }
 }
